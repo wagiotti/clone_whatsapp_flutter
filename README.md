@@ -1,6 +1,6 @@
 # clone_whatsapp_flutter
 
-Projeto desenvolvido para agregar conhecimentos
+Projeto totalmente voltado a apredizado em Flutter e Dart.
 
 ## Tecnologias usadas
 
