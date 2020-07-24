@@ -1,3 +1,4 @@
+import 'package:clone_whatsapp/cadastro.dart';
 import 'package:flutter/material.dart';
 
 class Login extends StatefulWidget {
@@ -81,12 +82,19 @@ class _LoginState extends State<Login> {
                 Center(
                   child: GestureDetector(
                     child: Text(
-                      'Não Tem conta, cadastre-se',
+                      'Não Tem conta, cadastre-se!',
                       style: TextStyle(
                         color: Colors.white,
                       ),
                     ),
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => Cadastro(),
+                        ),
+                      );
+                    },
                   ),
                 )
               ],
