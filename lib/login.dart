@@ -1,4 +1,7 @@
 import 'package:clone_whatsapp/cadastro.dart';
+import 'package:clone_whatsapp/home.dart';
+import 'package:clone_whatsapp/model/usuario.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class Login extends StatefulWidget {
@@ -7,6 +10,79 @@ class Login extends StatefulWidget {
 }
 
 class _LoginState extends State<Login> {
+  TextEditingController _controllerEmail = TextEditingController();
+  TextEditingController _controllerSenha = TextEditingController();
+  String _msgErro = '';
+
+  _validarCampos() {
+    String email = _controllerEmail.text;
+    String senha = _controllerSenha.text;
+
+    if (email.isNotEmpty && email.contains('@')) {
+      if (senha.isNotEmpty) {
+        setState(() {
+          _msgErro = '';
+        });
+        Usuario usuario = Usuario();
+        usuario.email = email;
+        usuario.senha = senha;
+
+        _logarUsuario(usuario);
+      } else {
+        setState(() {
+          _msgErro = 'Preencha a senha';
+        });
+      }
+    } else {
+      setState(() {
+        _msgErro = 'Email Invalido';
+      });
+    }
+  }
+
+  _logarUsuario(Usuario usuario) {
+    FirebaseAuth auth = FirebaseAuth.instance;
+    auth
+        .signInWithEmailAndPassword(
+      email: usuario.email,
+      password: usuario.senha,
+    )
+        .then((firebaseUser) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => Home(),
+        ),
+      );
+    }).catchError((error) {
+      setState(() {
+        _msgErro =
+            'Login invalido, verifique email e senha erro:${error.toString()}';
+      });
+    });
+  }
+
+  //verifica se usuário já esta logado no sistema
+  Future _verificaUsuarioLogado() async {
+    FirebaseAuth auth = FirebaseAuth.instance;
+    FirebaseUser usuarioLogado = await auth.currentUser();
+
+    if (usuarioLogado != null) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => Home(),
+        ),
+      );
+    }
+  }
+
+  @override
+  void initState() {
+    _verificaUsuarioLogado();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -31,6 +107,7 @@ class _LoginState extends State<Login> {
                 Padding(
                   padding: EdgeInsets.only(bottom: 8),
                   child: TextField(
+                    controller: _controllerEmail,
                     autofocus: true,
                     keyboardType: TextInputType.emailAddress,
                     style: TextStyle(fontSize: 20),
@@ -46,6 +123,7 @@ class _LoginState extends State<Login> {
                   ),
                 ),
                 TextField(
+                  controller: _controllerSenha,
                   keyboardType: TextInputType.text,
                   style: TextStyle(fontSize: 20),
                   decoration: InputDecoration(
@@ -76,7 +154,9 @@ class _LoginState extends State<Login> {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(32),
                     ),
-                    onPressed: () {},
+                    onPressed: () {
+                      _validarCampos();
+                    },
                   ),
                 ),
                 Center(
@@ -96,7 +176,19 @@ class _LoginState extends State<Login> {
                       );
                     },
                   ),
-                )
+                ),
+                Padding(
+                  padding: EdgeInsets.only(top: 16),
+                  child: Center(
+                    child: Text(
+                      _msgErro,
+                      style: TextStyle(
+                        color: Colors.yellow,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
