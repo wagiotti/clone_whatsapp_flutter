@@ -1,3 +1,5 @@
+import 'package:clone_whatsapp/telas/contatos.dart';
+import 'package:clone_whatsapp/telas/conversas.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -6,7 +8,8 @@ class Home extends StatefulWidget {
   _HomeState createState() => _HomeState();
 }
 
-class _HomeState extends State<Home> {
+class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
+  TabController _tabController;
   String _dadosUsuarioLogado = '';
 
   Future _recuperaDadosDoUsuario() async {
@@ -20,15 +23,45 @@ class _HomeState extends State<Home> {
 
   @override
   void initState() {
-    _recuperaDadosDoUsuario();
     super.initState();
+    _recuperaDadosDoUsuario();
+    _tabController = TabController(length: 2, vsync: this);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: Text(_dadosUsuarioLogado),
+      appBar: AppBar(
+        title: Text(
+          'WhatsApp',
+          style: TextStyle(
+            color: Colors.white,
+          ),
+        ),
+        bottom: TabBar(
+          indicatorWeight: 4,
+          labelStyle: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
+          controller: _tabController,
+          indicatorColor: Colors.white,
+          tabs: <Widget>[
+            Tab(
+              text: 'Conversas',
+            ),
+            Tab(
+              text: 'Contatos',
+            ),
+          ],
+        ),
+      ),
+      body: TabBarView(
+        controller: _tabController,
+        children: <Widget>[
+          Conversas(),
+          Contatos(),
+        ],
       ),
     );
   }
